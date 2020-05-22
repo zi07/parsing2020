@@ -1,0 +1,79 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>주소로 장소 표시하기</title>
+    
+</head>
+<body>
+
+<div class="main_wrap" style="width:100%; height:100%; border:1px solid blue; "> 
+
+<div class="left_list" style="width:10%; height:900px; border:3px solid red; float:left; overflow:scroll">
+<span style="font:0.1;">여기는 리스트 입니다.</span>
+		
+<?php
+require_once('Snoopy/Snoopy.class.php');
+$snoopy = new Snoopy;
+$snoopy->agent = $_SERVER['HTTP_USER_AGENT'];
+$snoopy->referer = "http://j123.co.kr";
+$snoopy->httpmethod = "POST"; // GET 지정시 GET으로 동작
+$params["pgesize"] = "50";
+$params["resChgPage"] = "1";
+$params["nowPge"] = "1";
+$params["jogun_2"] = "y";
+$params["SDay"] = "1";
+//$params["resYear1"] = "2020";
+//$params["resMonth1"] = "2";
+//$params["resday1"] = "7";
+//$params["resYear2"] = "2020";
+//$params["resMonth2"] = "3";
+//$params["resday2"] = "7";
+//위의 파라메터는 서칭 날짜 설정 기간을 한달로 잡았으나 값을 전송하지 않아도 디폴트값으로 잘 나옴.2020.05.22
+//$params["AreaSelect"] = "1"; // 1=지역으로설정, 2=법원으로설정
+$params["AreaSelect"] = "2"; // 1=지역으로설정, 2=법원으로설정
+$params["resBubwon"] = "0805"; // 1=지역으로설정, 2=법원으로설정
+/*
+09=서울특별시01=강원도02=경기도03=경상남도04=경상북도05=광주광역시06=대구광역시07=대전광역시08=부산광역시10=울산광역시11=인천광역시17=세종특별자치시12=전라남도13=전라북도15=충청남도16=충청북도14=제주도
+*/
+$params["resSiDo"] = "02";
+$params["resSiGuGun"] = "시흥시";
+$params["resSiGuGun"] = iconv("utf8", "euckr", $params["resSiGuGun"]);
+/*
+07근린시설, 08사무실, 09목욕탕, 10아파트상가, 11아파트형공장, 12콘도, 13주유소, 14창고, 15축사, 16공장, 17숙박시설, 18의료시설, 19교육시설, 20노유자시설, 21종교시설, 22기타시설
+23답, 24전, 25대지, 26임야, 27과수원, 28잡종지, 29하천, 30구거, 31묘지, 32도로, 33창고용지, 34종교용지, 35목장용지, 36주차장용지, 37공장용지, 38기타용지
+43광업권, 44어업권, 45염전, 46양어장, 47양어장용지, 48기타
+*/
+$params["resuse"] = "11아파트형공장, 12콘도, 13주유소, 14창고, 15축사, 17숙박시설, 18의료시설, 19교육시설, 20노유자시설, 21종교시설, 22기타시설, 23답, 24전, 25대지, 26임야, 27과수원, 28잡종지, 29하천, 30구거, 31묘지, 32도로, 33창고용지, 34종교용지, 35목장용지, 36주차장용지, 37공장용지, 38기타용지, 43광업권, 44어업권, 45염전, 46양어장, 47양어장용지, 48기타";
+$params["resuse"] = iconv("utf8", "euckr", $params["resuse"]);
+$params["resAuctionResult"] = "all";
+$snoopy->fetch('http://www.j123.co.kr/search01/totalsearch.asp');
+$snoopy->submit( "http://www.j123.co.kr/search01/totalsearch.asp", $params ); // 한글이 포함될 경우 UTF-8 인코딩 필요
+preg_match('/<FORM name="frmCheck" method=post ID="Form2">(.*?)<\/form>/is', $snoopy->results, $html);
+$html[0] = iconv("euckr", "utf8", $html[0]);
+echo $html[0];
+?>
+
+		<form action="https://map.kakao.com/" method="GET" target="add_show">
+
+            <input type="text" name="q" />
+
+            <br />
+
+            <input type="submit" />
+
+        </form>
+</div>
+
+
+<div id="right_map" style="width:88%; height:900px; border:3px solid orange; text-align:center; float:left;">
+<iframe src="https://map.kakao.com/" scrolling="yes" id = "add_show" name="add_show" width="100%" height="100%" style="text-align:center;">
+  iframe를 지원하지 않는 브라우저인 경우 대체정보를 제공
+</iframe>
+</div>
+</div>
+
+</body>
+</html>
